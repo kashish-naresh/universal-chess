@@ -39,6 +39,29 @@ Every move transaction locks the singleton `universal_state` pointer and current
 
 4. Open `http://localhost:3000`. `npm start` runs without the file watcher.
 
+## Docker
+
+Docker Engine and the Docker Compose plugin are required. Copy `.env.example` to `.env`, set a strong `MYSQL_PASSWORD` and private `ADMIN_TOKEN`, then start the app and its local MySQL database:
+
+```sh
+docker compose up --build -d
+```
+
+Open `http://localhost:3000`. Compose initializes a named `mysql_data` volume from `database/schema.sql`; the app applies its additive migrations at startup. Later starts reuse the database volume. View logs with `docker compose logs -f app`, and stop the services with `docker compose down`. `docker compose down -v` also deletes the local database volume.
+
+The image listens on port 3000. Set `PORT` to change the host port mapping and set `PUBLIC_URL` to the public HTTPS origin when serving it behind an HTTPS reverse proxy. Keep `.env` private.
+
+### Oracle Cloud
+
+Build and push the image to Oracle Cloud Infrastructure Registry (OCIR), then deploy it on an Oracle Cloud compute instance or container service with a reachable MySQL database. The image contains only the Node app; the Compose MySQL service is for local development. Configure the deployed container with `NODE_ENV=production`, `PORT=3000`, `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`, `PUBLIC_URL`, and `ADMIN_TOKEN`. Use the Oracle database's private endpoint and TLS/network settings as required by that database service. Allow inbound traffic only through your HTTPS reverse proxy, and set `PUBLIC_URL` to that HTTPS origin for Socket.IO origin checks.
+
+Example image build and push (replace the OCIR region, tenancy namespace, repository, and tag):
+
+```sh
+docker build -t <region-key>.ocir.io/<tenancy-namespace>/<repository>:<tag> .
+docker push <region-key>.ocir.io/<tenancy-namespace>/<repository>:<tag>
+```
+
 On startup the app applies the additive `002_repeat_participation` migration under a MySQL advisory lock, backfills game versions from the existing move log, and points the universal game state at the existing game. It does not drop tables or rewrite player/move records. The account needs `ALTER`, `INDEX`, and `CREATE` privileges in addition to table reads and writes for startup migrations. For a hosted deployment, set `PUBLIC_URL` to the app's HTTPS origin and place the Node process behind an HTTPS reverse proxy. Keep `.env` private, use a managed MySQL instance with backups, and run one or more app instances; the database lock keeps turn ownership consistent across instances.
 
 ## Configuration

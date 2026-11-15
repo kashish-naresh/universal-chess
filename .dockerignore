@@ -1,0 +1,15 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+node_modules
+npm-debug.log*
+coverage
+tests
+project-structure.txt
+Dockerfile*
+docker-compose*.yml
+docker-compose*.yaml
+compose*.yml
+compose*.yaml

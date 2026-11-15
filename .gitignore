@@ -1,4 +1,48 @@
+# Dependencies
 node_modules/
+
+# Environment variables and secrets
 .env
+.env.*
+!.env.example
+
+# Logs
 npm-debug.log*
-package-lock.json
+yarn-debug.log*
+pnpm-debug.log*
+*.log
+
+# Build output
+dist/
+build/
+.next/
+out/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Runtime files
+*.pid
+*.seed
+pids/
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Operating system
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+tmp/
+temp/
+
+# Private keys and certificates
+*.pem
+*.key
+*.crt
