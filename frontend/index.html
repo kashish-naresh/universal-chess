@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b100e"><title>Universal Chess — one game, everyone plays</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="/js/preferences.js"></script>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js" defer></script>
+  <script src="/socket.io/socket.io.js" defer></script><script src="/js/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/"><span class="brand-mark">♞</span><span>UNIVERSAL<span class="brand-light">CHESS</span></span></a>
+      <div class="header-stats"><span class="live"><i></i><b id="online-count">0</b> ONLINE</span><span class="header-divider"></span><span><b id="move-count">0</b> MOVES</span><span class="header-divider wide-only"></span><span class="connection"><i id="connection-dot"></i><b id="connection-status">CONNECTING</b></span></div>
+      <div class="header-actions"><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme">☼</button><button class="copy-button" id="copy-pgn" type="button" title="Copy game PGN">⧉ <span>PGN</span></button></div>
+    </header>
+    <main class="main-grid">
+      <section class="game-stage">
+        <div class="stage-heading"><div><span class="kicker">THE WORLD'S SHARED BOARD</span><h1>One game. <em>Everyone plays.</em></h1></div><div class="game-code"><span>GAME</span><b>#001</b></div></div>
+        <div class="match-bar">
+          <div class="team-indicator white-indicator" id="white-indicator"><span class="team-glyph">♔</span><span><small>WHITE TEAM</small><b id="white-player">WAITING</b></span><i class="team-light"></i></div>
+          <div class="turn-center"><span class="turn-caption">CURRENT TURN</span><b id="turn-text">WHITE TO MOVE</b><span class="turn-piece" id="turn-piece">♙</span></div>
+          <div class="team-indicator black-indicator" id="black-indicator"><span class="team-glyph">♚</span><span><small>BLACK TEAM</small><b id="black-player">WAITING</b></span><i class="team-light"></i></div>
+        </div>
+        <div class="board-zone">
+          <div class="board-frame"><div class="rank-labels" id="rank-labels"></div><div class="board" id="board" aria-label="Shared chessboard"></div><div class="file-labels" id="file-labels"></div></div>
+          <div class="board-side">
+            <div class="clock-card"><span class="eyebrow">TIME TO MOVE</span><div class="clock" id="timer">--<small>s</small></div><div class="clock-track"><i id="clock-progress"></i></div><p id="status-text">Connecting to the shared game…</p></div>
+            <div class="last-card"><span class="eyebrow">LAST MOVE</span><strong id="last-move">Waiting for the opening move</strong><span class="last-tag" id="move-number">MOVE 01</span></div>
+            <div class="activity-card"><span class="eyebrow">GLOBAL ACTIVITY</span><div class="activity-grid"><div><b id="participant-total">0</b><span>PLAYERS</span></div><div><b id="duration-total">0m</b><span>GAME TIME</span></div><div><b id="white-player-total">0</b><span>WHITE</span></div><div><b id="black-player-total">0</b><span>BLACK</span></div></div></div>
+          </div>
+        </div>
+        <div class="controls-bar"><div class="my-status" id="my-queue"><i class="status-icon">◉</i><span><strong>YOU ARE WATCHING</strong><small>Pick a team to join the next opportunity.</small></span></div><div class="join-controls"><button class="join-button join-white" id="join-white" type="button" hidden><b>♔</b><span class="join-label">JOIN WHITE</span><span id="white-waiting">0</span></button><button class="join-button join-black" id="join-black" type="button" hidden><b>♚</b><span class="join-label">JOIN BLACK</span><span id="black-waiting">0</span></button><button class="leave-button" id="leave-queue" type="button" hidden>LEAVE QUEUE</button></div></div>
+      </section>
+      <aside class="side-panels">
+        <div class="panel-tabs"><button type="button" class="panel-tab active" data-panel="queues-panel">QUEUES</button><button type="button" class="panel-tab" data-panel="history-panel">MOVE HISTORY <span id="history-total">0</span></button></div>
+        <section class="panel-content" id="queues-panel">
+          <div class="panel-title"><div><span class="kicker">THE TEAMS</span><h2>Waiting room</h2></div><span class="live-label"><i></i> LIVE</span></div>
+          <div class="queue-card queue-white"><div class="queue-heading"><span>♙</span><b>WHITE</b><small><b id="white-count">0</b> WAITING</small></div><ol id="white-list" class="queue-list"></ol></div>
+          <div class="queue-card queue-black"><div class="queue-heading"><span>♟</span><b>BLACK</b><small><b id="black-count">0</b> WAITING</small></div><ol id="black-list" class="queue-list"></ol></div>
+          <div class="how-card"><span>✦</span><p><b>Every move changes the team.</b><br>Make one legal move when your side gets the board. Miss the clock? Rejoin at the back.</p></div>
+        </section>
+        <section class="panel-content history-panel" id="history-panel" hidden>
+          <div class="panel-title"><div><span class="kicker">EVERY MOVE, FOREVER</span><h2>Game notation</h2></div><button class="small-copy" id="copy-pgn-side" type="button">COPY PGN</button></div>
+          <div class="move-history" id="move-history"><div class="empty-history">The first move is waiting to be played.</div></div>
+        </section>
+        <footer class="side-footer"><span>♜ &nbsp; ONE BOARD, SHARED GLOBALLY</span><span id="status-dot" class="status-dot"></span></footer>
+      </aside>
+    </main>
+  </div>
+  <section class="game-over" id="game-over" aria-modal="true" role="dialog" aria-labelledby="game-result" hidden>
+    <div class="game-over-card"><span class="end-mark">♛</span><span class="kicker">THE SHARED GAME HAS ENDED</span><h2 id="game-result">CHECKMATE</h2><p id="game-over-detail">The final move is recorded for everyone.</p><div class="final-move" id="final-move"></div><div class="end-actions"><button id="copy-final-pgn" type="button">COPY PGN</button><button id="download-pgn" type="button">DOWNLOAD PGN</button></div><button class="admin-new-game" id="new-game" type="button">START NEW GAME · ADMIN</button></div>
+  </section>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
